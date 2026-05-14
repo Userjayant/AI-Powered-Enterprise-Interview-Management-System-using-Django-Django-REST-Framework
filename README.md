@@ -70,6 +70,8 @@ The system features an **AI Resume Scoring Engine** that automatically evaluates
 
 ## 📁 Project Structure
 
+
+```bash
 AI-Powered Enterprise Interview Management System
 │
 ├── manage.py
@@ -102,11 +104,12 @@ AI-Powered Enterprise Interview Management System
 │
 ├── accounts/
 │   ├── migrations/
-│   ├── templates/accounts/
-│   │   ├── login.html
-│   │   ├── register.html
-│   │   ├── profile.html
-│   │   └── change_password.html
+│   ├── templates/
+│   │   └── accounts/
+│   │       ├── login.html
+│   │       ├── register.html
+│   │       ├── profile.html
+│   │       └── change_password.html
 │   │
 │   ├── __init__.py
 │   ├── admin.py
@@ -120,14 +123,15 @@ AI-Powered Enterprise Interview Management System
 │
 ├── candidates/
 │   ├── migrations/
-│   ├── templates/candidates/
-│   │   ├── list.html
-│   │   ├── detail.html
-│   │   ├── create.html
-│   │   ├── update.html
-│   │   ├── delete.html
-│   │   ├── job_list.html
-│   │   └── job_form.html
+│   ├── templates/
+│   │   └── candidates/
+│   │       ├── list.html
+│   │       ├── detail.html
+│   │       ├── create.html
+│   │       ├── update.html
+│   │       ├── delete.html
+│   │       ├── job_list.html
+│   │       └── job_form.html
 │   │
 │   ├── __init__.py
 │   ├── admin.py
@@ -141,14 +145,15 @@ AI-Powered Enterprise Interview Management System
 │
 ├── interviews/
 │   ├── migrations/
-│   ├── templates/interviews/
-│   │   ├── list.html
-│   │   ├── detail.html
-│   │   ├── schedule.html
-│   │   ├── edit.html
-│   │   ├── calendar.html
-│   │   ├── feedback_form.html
-│   │   └── feedback_detail.html
+│   ├── templates/
+│   │   └── interviews/
+│   │       ├── list.html
+│   │       ├── detail.html
+│   │       ├── schedule.html
+│   │       ├── edit.html
+│   │       ├── calendar.html
+│   │       ├── feedback_form.html
+│   │       └── feedback_detail.html
 │   │
 │   ├── __init__.py
 │   ├── admin.py
@@ -160,11 +165,12 @@ AI-Powered Enterprise Interview Management System
 │   └── services.py
 │
 ├── dashboard/
-│   ├── templates/dashboard/
-│   │   ├── hr_dashboard.html
-│   │   ├── interviewer_dashboard.html
-│   │   ├── candidate_dashboard.html
-│   │   └── analytics.html
+│   ├── templates/
+│   │   └── dashboard/
+│   │       ├── hr_dashboard.html
+│   │       ├── interviewer_dashboard.html
+│   │       ├── candidate_dashboard.html
+│   │       └── analytics.html
 │   │
 │   ├── __init__.py
 │   ├── urls.py
@@ -180,6 +186,9 @@ AI-Powered Enterprise Interview Management System
 │   └── pagination.py
 │
 └── venv/
+```
+
+
 
 ## ⚙️ Local Setup
 
