@@ -70,33 +70,20 @@ The system features an **AI Resume Scoring Engine** that automatically evaluates
 
 ## 📁 Project Structure
 
+# Current Project Structure
 
 ```bash
-AI-Powered Enterprise Interview Management System
-│
+NEW_INTERVIEW_SYSTEM/
+
 ├── manage.py
 ├── db.sqlite3
 ├── requirements.txt
-├── README.md
-├── .env
-│
 ├── logs/
 ├── media/
 ├── static/
-│   ├── css/
-│   ├── js/
-│   ├── images/
-│   └── vendor/
-│
 ├── templates/
-│   ├── base.html
-│   ├── navbar.html
-│   ├── sidebar.html
-│   ├── messages.html
-│   └── components/
 │
 ├── config/
-│   ├── __init__.py
 │   ├── settings.py
 │   ├── urls.py
 │   ├── asgi.py
@@ -104,91 +91,44 @@ AI-Powered Enterprise Interview Management System
 │
 ├── accounts/
 │   ├── migrations/
-│   ├── templates/
-│   │   └── accounts/
-│   │       ├── login.html
-│   │       ├── register.html
-│   │       ├── profile.html
-│   │       └── change_password.html
-│   │
-│   ├── __init__.py
+│   ├── templates/accounts/
 │   ├── admin.py
 │   ├── apps.py
 │   ├── forms.py
 │   ├── models.py
-│   ├── signals.py
-│   ├── urls.py
-│   ├── views.py
-│   └── utils.py
-│
-├── candidates/
-│   ├── migrations/
-│   ├── templates/
-│   │   └── candidates/
-│   │       ├── list.html
-│   │       ├── detail.html
-│   │       ├── create.html
-│   │       ├── update.html
-│   │       ├── delete.html
-│   │       ├── job_list.html
-│   │       └── job_form.html
-│   │
-│   ├── __init__.py
-│   ├── admin.py
-│   ├── apps.py
-│   ├── forms.py
-│   ├── models.py
-│   ├── filters.py
-│   ├── urls.py
-│   ├── views.py
-│   └── services.py
-│
-├── interviews/
-│   ├── migrations/
-│   ├── templates/
-│   │   └── interviews/
-│   │       ├── list.html
-│   │       ├── detail.html
-│   │       ├── schedule.html
-│   │       ├── edit.html
-│   │       ├── calendar.html
-│   │       ├── feedback_form.html
-│   │       └── feedback_detail.html
-│   │
-│   ├── __init__.py
-│   ├── admin.py
-│   ├── apps.py
-│   ├── forms.py
-│   ├── models.py
-│   ├── urls.py
-│   ├── views.py
-│   └── services.py
-│
-├── dashboard/
-│   ├── templates/
-│   │   └── dashboard/
-│   │       ├── hr_dashboard.html
-│   │       ├── interviewer_dashboard.html
-│   │       ├── candidate_dashboard.html
-│   │       └── analytics.html
-│   │
-│   ├── __init__.py
 │   ├── urls.py
 │   └── views.py
 │
-├── api/
+├── candidates/
 │   ├── migrations/
-│   ├── __init__.py
+│   ├── templates/candidates/
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── urls.py
+│   └── views.py
+│
+├── interviews/
+│   ├── migrations/
+│   ├── templates/interviews/
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── urls.py
+│   └── views.py
+│
+├── dashboard/
+│   ├── templates/dashboard/
+│   ├── views.py
+│   └── urls.py
+│
+├── api/
 │   ├── serializers.py
 │   ├── urls.py
-│   ├── views.py
-│   ├── permissions.py
-│   └── pagination.py
-│
-└── venv/
+│   └── views.py
 ```
-
-
 
 ## ⚙️ Local Setup
 
