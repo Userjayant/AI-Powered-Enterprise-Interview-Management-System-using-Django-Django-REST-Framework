@@ -6,7 +6,7 @@
 <img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
 <img src="https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white"/>
 
-# 💼 InterviewIQ — AI-Powered Interview Management System
+# 💼 AI-Powered Enterprise Interview Management System using Django & Django REST Framework
 
 **A production-quality, enterprise-grade recruitment platform built with Django & Django REST Framework.**  
 Streamline your entire hiring pipeline — from job posting to final selection — with AI resume scoring, role-based dashboards, and real-time analytics.
@@ -70,24 +70,116 @@ The system features an **AI Resume Scoring Engine** that automatically evaluates
 
 ## 📁 Project Structure
 
-NEW_INTERVIEW_SYSTEM/
-├── config/               # Django settings, root URLs, WSGI/ASGI
-├── accounts/             # Custom User model, login, register, profile
-├── candidates/           # JobRole + Candidate models, AI scoring engine
-├── interviews/           # Interview scheduling, feedback, notifications
-├── dashboard/            # Role-specific analytics dashboards
-├── api/                  # DRF ViewSets, Serializers, JWT endpoints
-├── templates/            # Global base layout (sidebar, topbar)
-│   └── accounts/         # Auth templates
-├── static/               # CSS, JS, images
-├── media/                # User uploads (resumes, profile images)
-├── logs/                 # Application log files
-├── seed_data.py          # One-command demo data seeder
-├── requirements.txt      # All Python dependencies
-├── .env.example          # Environment variable template
-└── manage.py
-
----
+AI-Powered Enterprise Interview Management System
+│
+├── manage.py
+├── db.sqlite3
+├── requirements.txt
+├── README.md
+├── .env
+│
+├── logs/
+├── media/
+├── static/
+│   ├── css/
+│   ├── js/
+│   ├── images/
+│   └── vendor/
+│
+├── templates/
+│   ├── base.html
+│   ├── navbar.html
+│   ├── sidebar.html
+│   ├── messages.html
+│   └── components/
+│
+├── config/
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   ├── asgi.py
+│   └── wsgi.py
+│
+├── accounts/
+│   ├── migrations/
+│   ├── templates/accounts/
+│   │   ├── login.html
+│   │   ├── register.html
+│   │   ├── profile.html
+│   │   └── change_password.html
+│   │
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── signals.py
+│   ├── urls.py
+│   ├── views.py
+│   └── utils.py
+│
+├── candidates/
+│   ├── migrations/
+│   ├── templates/candidates/
+│   │   ├── list.html
+│   │   ├── detail.html
+│   │   ├── create.html
+│   │   ├── update.html
+│   │   ├── delete.html
+│   │   ├── job_list.html
+│   │   └── job_form.html
+│   │
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── filters.py
+│   ├── urls.py
+│   ├── views.py
+│   └── services.py
+│
+├── interviews/
+│   ├── migrations/
+│   ├── templates/interviews/
+│   │   ├── list.html
+│   │   ├── detail.html
+│   │   ├── schedule.html
+│   │   ├── edit.html
+│   │   ├── calendar.html
+│   │   ├── feedback_form.html
+│   │   └── feedback_detail.html
+│   │
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── urls.py
+│   ├── views.py
+│   └── services.py
+│
+├── dashboard/
+│   ├── templates/dashboard/
+│   │   ├── hr_dashboard.html
+│   │   ├── interviewer_dashboard.html
+│   │   ├── candidate_dashboard.html
+│   │   └── analytics.html
+│   │
+│   ├── __init__.py
+│   ├── urls.py
+│   └── views.py
+│
+├── api/
+│   ├── migrations/
+│   ├── __init__.py
+│   ├── serializers.py
+│   ├── urls.py
+│   ├── views.py
+│   ├── permissions.py
+│   └── pagination.py
+│
+└── venv/
 
 ## ⚙️ Local Setup
 
