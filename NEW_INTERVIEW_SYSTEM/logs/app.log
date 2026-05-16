@@ -1,0 +1,6 @@
+INFO 2026-05-13 17:46:39,656 autoreload Watching for file changes with StatReloader
+INFO 2026-05-13 17:48:33,184 autoreload Watching for file changes with StatReloader
+INFO 2026-05-13 17:52:27,295 autoreload Watching for file changes with StatReloader
+WARNING 2026-05-13 17:52:41,544 log Not Found: /favicon.ico
+WARNING 2026-05-13 17:56:38,265 log Not Found: /hradmin
+WARNING 2026-05-13 17:56:48,070 log Not Found: /hr admin
