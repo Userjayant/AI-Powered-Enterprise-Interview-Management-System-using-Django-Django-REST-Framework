@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block title %}Interviewer Dashboard — InterviewIQ{% endblock %}
+{% block page_title %}My Dashboard{% endblock %}
+{% block page_subtitle %}Your interview assignments and feedback{% endblock %}
+
+{% block content %}
+
+<!-- STATS -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3 col-6">
+    <div class="ims-stat">
+      <div class="ims-stat-icon" style="background:#eef2ff;color:#4f46e5;"><i class="bi bi-calendar2-check-fill"></i></div>
+      <div>
+        <div class="ims-stat-value">{{ total_assigned }}</div>
+        <div class="ims-stat-label">Total Assigned</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="ims-stat">
+      <div class="ims-stat-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-check2-circle"></i></div>
+      <div>
+        <div class="ims-stat-value" style="color:#059669;">{{ completed }}</div>
+        <div class="ims-stat-label">Completed</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="ims-stat">
+      <div class="ims-stat-icon" style="background:#fefce8;color:#ca8a04;"><i class="bi bi-pencil-square"></i></div>
+      <div>
+        <div class="ims-stat-value" style="color:#ca8a04;">{{ pending_feedback }}</div>
+        <div class="ims-stat-label">Pending Feedback</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="ims-stat">
+      <div class="ims-stat-icon" style="background:#fff7ed;color:#ea580c;"><i class="bi bi-star-fill"></i></div>
+      <div>
+        <div class="ims-stat-value" style="color:#ea580c;">{{ avg_score }}/10</div>
+        <div class="ims-stat-label">Avg Score Given</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <!-- Today's Interviews -->
+  <div class="col-lg-6">
+    <div class="ims-card">
+      <div class="ims-card-header">
+        <span class="ims-card-title">📅 Today's Interviews</span>
+      </div>
+      <div class="ims-card-body">
+        {% for interview in today_interviews %}
+        <div class="d-flex align-items-start gap-3 p-3 rounded-3 mb-2" style="background:#f8fafc;border:1px solid #e2e8f0;">
+          <div style="background:#eef2ff;border-radius:10px;padding:10px 14px;text-align:center;flex-shrink:0;">
+            <div style="font-size:16px;font-weight:800;color:#4f46e5;">{{ interview.scheduled_at|date:"h:i" }}</div>
+            <div style="font-size:9px;color:#6366f1;text-transform:uppercase;">{{ interview.scheduled_at|date:"A" }}</div>
+          </div>
+          <div style="flex:1;">
+            <div class="fw-semibold" style="font-size:14px;">{{ interview.candidate.full_name }}</div>
+            <div style="font-size:12px;color:#64748b;">{{ interview.get_round_type_display }} · {{ interview.duration }} min</div>
+            {% if interview.meeting_link %}
+            <a href="{{ interview.meeting_link }}" target="_blank" class="btn btn-sm mt-2" style="background:#4f46e5;color:#fff;border-radius:6px;font-size:12px;padding:4px 12px;">
+              <i class="bi bi-camera-video me-1"></i> Join Meeting
+            </a>
+            {% endif %}
+          </div>
+        </div>
+        {% empty %}
+        <div class="ims-empty" style="padding:40px 0;">
+          <i class="bi bi-sun" style="font-size:36px;margin-bottom:12px;display:block;color:#f59e0b;"></i>
+          No interviews scheduled for today.
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Interviews -->
+  <div class="col-lg-6">
+    <div class="ims-card">
+      <div class="ims-card-header">
+        <span class="ims-card-title">Upcoming Interviews</span>
+        <a href="{% url 'interviews:list' %}" style="font-size:13px;color:#4f46e5;font-weight:600;text-decoration:none;">View all →</a>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="ims-table">
+          <thead><tr><th>Candidate</th><th>Round</th><th>Date/Time</th><th></th></tr></thead>
+          <tbody>
+            {% for i in upcoming %}
+            <tr>
+              <td>
+                <div class="fw-semibold" style="font-size:13px;">{{ i.candidate.full_name }}</div>
+                <div style="font-size:11px;color:#94a3b8;">{{ i.candidate.applied_role.title|default:"N/A" }}</div>
+              </td>
+              <td style="font-size:13px;">{{ i.get_round_type_display }}</td>
+              <td style="font-size:12px;color:#64748b;">{{ i.scheduled_at|date:"d M, h:i A" }}</td>
+              <td><a href="{% url 'interviews:detail' i.pk %}" style="font-size:12px;color:#4f46e5;font-weight:600;text-decoration:none;">View</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center text-muted py-4">No upcoming interviews.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Feedback Submitted -->
+  <div class="col-12">
+    <div class="ims-card">
+      <div class="ims-card-header">
+        <span class="ims-card-title">Recent Feedback Submitted</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="ims-table">
+          <thead><tr><th>Candidate</th><th>Round</th><th>Technical</th><th>Communication</th><th>Overall</th><th>Recommendation</th><th>Date</th></tr></thead>
+          <tbody>
+            {% for f in recent_feedback %}
+            <tr>
+              <td class="fw-semibold" style="font-size:13px;">{{ f.interview.candidate.full_name }}</td>
+              <td style="font-size:12px;color:#64748b;">{{ f.interview.get_round_type_display }}</td>
+              <td><span style="font-weight:700;color:#4f46e5;">{{ f.technical_score }}/10</span></td>
+              <td><span style="font-weight:700;">{{ f.communication_score }}/10</span></td>
+              <td>
+                <span style="font-weight:800;font-size:15px;color:{% if f.overall_score >= 7 %}#059669{% elif f.overall_score >= 5 %}#ca8a04{% else %}#ef4444{% endif %};">
+                  {{ f.overall_score }}/10
+                </span>
+              </td>
+              <td><span class="badge {{ f.get_recommendation_badge }} px-2 py-1" style="font-size:11px;">{{ f.get_recommendation_display }}</span></td>
+              <td style="font-size:12px;color:#94a3b8;">{{ f.created_at|date:"d M Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-center text-muted py-4">No feedback submitted yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

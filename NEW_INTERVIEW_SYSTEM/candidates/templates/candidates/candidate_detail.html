@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+{% block title %}{{ candidate.full_name }} — InterviewIQ{% endblock %}
+{% block page_title %}{{ candidate.full_name }}{% endblock %}
+{% block page_subtitle %}Candidate Profile & Interview History{% endblock %}
+
+{% block topbar_actions %}
+{% if user.is_hr_admin %}
+<a href="{% url 'candidates:update' candidate.pk %}" class="btn btn-sm btn-outline-secondary me-1" style="border-radius:8px;font-weight:600;">
+  <i class="bi bi-pencil me-1"></i>Edit
+</a>
+<a href="{% url 'interviews:schedule' %}?candidate={{ candidate.pk }}" class="btn-ims btn btn-sm">
+  <i class="bi bi-calendar-plus me-1"></i>Schedule Interview
+</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+  <!-- LEFT: Profile Card -->
+  <div class="col-lg-4">
+    <!-- Basic Info -->
+    <div class="ims-card mb-3">
+      <div class="ims-card-body" style="padding:28px 24px;text-align:center;">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#0ea5e9);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;margin:0 auto 14px;">
+          {{ candidate.full_name|slice:":1"|upper }}
+        </div>
+        <h5 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;color:#0f172a;margin-bottom:4px;">{{ candidate.full_name }}</h5>
+        <div style="font-size:13px;color:#64748b;margin-bottom:12px;">{{ candidate.email }}</div>
+        <span class="badge {{ candidate.get_status_badge_class }}" style="font-size:12px;padding:6px 16px;border-radius:99px;">
+          {{ candidate.get_status_display }}
+        </span>
+
+        <!-- AI Score Ring -->
+        <div class="mt-4 p-3 rounded-3" style="background:#f8fafc;border:1px solid #e2e8f0;">
+          <div style="font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">AI Resume Score</div>
+          <div style="font-size:36px;font-weight:800;color:{% if candidate.ai_resume_score >= 70 %}#059669{% elif candidate.ai_resume_score >= 40 %}#ca8a04{% else %}#ef4444{% endif %};">
+            {{ candidate.ai_resume_score }}%
+          </div>
+          <div class="score-bar-wrap mt-2">
+            <div class="score-bar" style="width:{{ candidate.ai_resume_score }}%;background:{% if candidate.ai_resume_score >= 70 %}#10b981{% elif candidate.ai_resume_score >= 40 %}#f59e0b{% else %}#ef4444{% endif %};"></div>
+          </div>
+          {% if user.is_hr_admin %}
+          <button class="btn btn-sm mt-2 w-100" style="background:#eef2ff;color:#4f46e5;border-radius:8px;font-size:12px;font-weight:600;" onclick="recomputeScore({{ candidate.pk }})">
+            <i class="bi bi-arrow-clockwise me-1"></i>Recompute Score
+          </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Details -->
+    <div class="ims-card mb-3">
+      <div class="ims-card-header"><span class="ims-card-title">Details</span></div>
+      <div class="ims-card-body">
+        {% if candidate.phone %}
+        <div class="d-flex justify-content-between mb-2">
+          <span style="font-size:12px;color:#94a3b8;font-weight:600;">Phone</span>
+          <span style="font-size:13px;font-weight:500;">{{ candidate.phone }}</span>
+        </div>
+        {% endif %}
+        <div class="d-flex justify-content-between mb-2">
+          <span style="font-size:12px;color:#94a3b8;font-weight:600;">Experience</span>
+          <span style="font-size:13px;font-weight:500;">{{ candidate.experience }} years</span>
+        </div>
+        {% if candidate.current_company %}
+        <div class="d-flex justify-content-between mb-2">
+          <span style="font-size:12px;color:#94a3b8;font-weight:600;">Current Company</span>
+          <span style="font-size:13px;font-weight:500;">{{ candidate.current_company }}</span>
+        </div>
+        {% endif %}
+        {% if candidate.current_ctc %}
+        <div class="d-flex justify-content-between mb-2">
+          <span style="font-size:12px;color:#94a3b8;font-weight:600;">Current CTC</span>
+          <span style="font-size:13px;font-weight:500;">{{ candidate.current_ctc }} LPA</span>
+        </div>
+        {% endif %}
+        {% if candidate.expected_ctc %}
+        <div class="d-flex justify-content-between mb-2">
+          <span style="font-size:12px;color:#94a3b8;font-weight:600;">Expected CTC</span>
+          <span style="font-size:13px;font-weight:500;">{{ candidate.expected_ctc }} LPA</span>
+        </div>
+        {% endif %}
+        <div class="d-flex justify-content-between mb-2">
+          <span style="font-size:12px;color:#94a3b8;font-weight:600;">Notice Period</span>
+          <span style="font-size:13px;font-weight:500;">{{ candidate.notice_period }} days</span>
+        </div>
+        {% if candidate.source %}
+        <div class="d-flex justify-content-between mb-2">
+          <span style="font-size:12px;color:#94a3b8;font-weight:600;">Source</span>
+          <span style="font-size:13px;font-weight:500;">{{ candidate.source }}</span>
+        </div>
+        {% endif %}
+        <div class="d-flex justify-content-between">
+          <span style="font-size:12px;color:#94a3b8;font-weight:600;">Applied On</span>
+          <span style="font-size:13px;font-weight:500;">{{ candidate.created_at|date:"d M Y" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Links & Resume -->
+    <div class="ims-card">
+      <div class="ims-card-header"><span class="ims-card-title">Links & Documents</span></div>
+      <div class="ims-card-body">
+        {% if candidate.resume %}
+        <a href="{{ candidate.resume.url }}" target="_blank" class="btn w-100 mb-2" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:600;color:#334155;">
+          <i class="bi bi-file-earmark-pdf text-danger me-2"></i>View Resume
+        </a>
+        {% endif %}
+        {% if candidate.linkedin_profile %}
+        <a href="{{ candidate.linkedin_profile }}" target="_blank" class="btn w-100 mb-2" style="background:#eff6ff;border:none;border-radius:8px;font-size:13px;font-weight:600;color:#2563eb;">
+          <i class="bi bi-linkedin me-2"></i>LinkedIn Profile
+        </a>
+        {% endif %}
+        {% if candidate.github_profile %}
+        <a href="{{ candidate.github_profile }}" target="_blank" class="btn w-100" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:600;color:#334155;">
+          <i class="bi bi-github me-2"></i>GitHub Profile
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Main Content -->
+  <div class="col-lg-8">
+
+    <!-- Applied Role & Skills -->
+    <div class="ims-card mb-3">
+      <div class="ims-card-header">
+        <span class="ims-card-title">Applied Position & Skills</span>
+      </div>
+      <div class="ims-card-body">
+        {% if candidate.applied_role %}
+        <div class="p-3 rounded-3 mb-3" style="background:#eef2ff;border:1px solid #c7d2fe;">
+          <div style="font-size:11px;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Applied For</div>
+          <div style="font-size:16px;font-weight:700;color:#1e1b4b;margin-top:4px;">{{ candidate.applied_role.title }}</div>
+          <div style="font-size:12px;color:#6366f1;">{{ candidate.applied_role.department }} · {{ candidate.applied_role.minimum_experience }}+ yrs required</div>
+        </div>
+
+        <!-- Skills Match -->
+        {% if candidate.applied_role.get_skills_list %}
+        <div style="font-size:12px;color:#94a3b8;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Skills Match</div>
+        <div class="d-flex flex-wrap gap-2">
+          {% for skill in candidate.applied_role.get_skills_list %}
+          {% if skill|lower in candidate.skills|lower %}
+          <span class="badge" style="background:#dcfce7;color:#166534;font-size:12px;padding:5px 12px;border-radius:99px;font-weight:500;">
+            <i class="bi bi-check-circle-fill me-1"></i>{{ skill }}
+          </span>
+          {% else %}
+          <span class="badge" style="background:#fef2f2;color:#991b1b;font-size:12px;padding:5px 12px;border-radius:99px;font-weight:500;">
+            <i class="bi bi-x-circle me-1"></i>{{ skill }}
+          </span>
+          {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% else %}
+        <p style="color:#94a3b8;font-size:13px;">No role assigned yet.</p>
+        {% endif %}
+
+        <!-- Candidate Skills -->
+        <div class="mt-3">
+          <div style="font-size:12px;color:#94a3b8;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">All Skills</div>
+          <div class="d-flex flex-wrap gap-2">
+            {% for skill in candidate.get_skills_list %}
+            <span class="badge" style="background:#eef2ff;color:#4f46e5;font-size:12px;padding:5px 12px;border-radius:99px;font-weight:500;">{{ skill }}</span>
+            {% empty %}
+            <span style="font-size:13px;color:#94a3b8;">No skills listed</span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Update (HR Only) -->
+    {% if user.is_hr_admin %}
+    <div class="ims-card mb-3">
+      <div class="ims-card-header"><span class="ims-card-title">Update Status</span></div>
+      <div class="ims-card-body">
+        <form method="post" action="{% url 'candidates:status_update' candidate.pk %}">
+          {% csrf_token %}
+          <div class="row g-2">
+            <div class="col-md-4">
+              {{ status_form.status }}
+            </div>
+            <div class="col-md-6">
+              {{ status_form.remarks }}
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn-ims btn w-100">Update</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Remarks -->
+    {% if candidate.remarks %}
+    <div class="ims-card mb-3">
+      <div class="ims-card-header"><span class="ims-card-title">HR Remarks</span></div>
+      <div class="ims-card-body">
+        <p style="font-size:14px;color:#334155;line-height:1.7;margin:0;">{{ candidate.remarks }}</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Interview History -->
+    <div class="ims-card">
+      <div class="ims-card-header">
+        <span class="ims-card-title">Interview History ({{ interviews.count }})</span>
+        {% if user.is_hr_admin %}
+        <a href="{% url 'interviews:schedule' %}?candidate={{ candidate.pk }}" style="font-size:13px;color:#4f46e5;font-weight:600;text-decoration:none;">
+          <i class="bi bi-plus-circle me-1"></i>Schedule
+        </a>
+        {% endif %}
+      </div>
+      {% if interviews %}
+      <div style="overflow-x:auto;">
+        <table class="ims-table">
+          <thead>
+            <tr><th>Round</th><th>Interviewer</th><th>Date & Time</th><th>Duration</th><th>Status</th><th>Score</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for interview in interviews %}
+            <tr>
+              <td style="font-size:13px;font-weight:600;">{{ interview.get_round_type_display }}</td>
+              <td style="font-size:13px;">{{ interview.interviewer.get_full_name|default:"TBD" }}</td>
+              <td style="font-size:12px;color:#64748b;">{{ interview.scheduled_at|date:"d M Y, h:i A" }}</td>
+              <td style="font-size:12px;color:#64748b;">{{ interview.duration }} min</td>
+              <td><span class="badge {{ interview.get_status_badge }}" style="font-size:11px;padding:4px 10px;border-radius:99px;">{{ interview.get_status_display }}</span></td>
+              <td>
+                {% if interview.has_feedback %}
+                <span style="font-size:14px;font-weight:800;color:{% if interview.feedback.overall_score >= 7 %}#059669{% elif interview.feedback.overall_score >= 5 %}#ca8a04{% else %}#ef4444{% endif %};">
+                  {{ interview.feedback.overall_score }}/10
+                </span>
+                {% else %}
+                <span style="font-size:12px;color:#94a3b8;">Pending</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% url 'interviews:detail' interview.pk %}" style="font-size:12px;color:#4f46e5;font-weight:600;text-decoration:none;">View →</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="ims-empty">
+        <i class="bi bi-camera-video-off"></i>
+        No interviews scheduled yet.
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Delete (HR Only) -->
+    {% if user.is_hr_admin %}
+    <div class="mt-3 text-end">
+      <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" style="border-radius:8px;font-size:13px;">
+        <i class="bi bi-trash me-1"></i>Delete Candidate
+      </button>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Delete Modal -->
+{% if user.is_hr_admin %}
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content" style="border-radius:16px;border:none;">
+      <div class="modal-body text-center p-4">
+        <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size:40px;"></i>
+        <h6 class="mt-3 fw-bold">Delete Candidate?</h6>
+        <p style="font-size:13px;color:#64748b;">This will permanently remove {{ candidate.full_name }} and all related data.</p>
+        <form method="post" action="{% url 'candidates:delete' candidate.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger w-100 mb-2" style="border-radius:8px;">Yes, Delete</button>
+          <button type="button" class="btn btn-light w-100" style="border-radius:8px;" data-bs-dismiss="modal">Cancel</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function recomputeScore(pk) {
+  fetch(`/candidates/${pk}/ai-score/`, {
+    method: 'POST',
+    headers: {'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json'}
+  })
+  .then(r => r.json())
+  .then(data => {
+    alert(data.message);
+    location.reload();
+  })
+  .catch(() => alert('Error recomputing score.'));
+}
+</script>
+{% endblock %}

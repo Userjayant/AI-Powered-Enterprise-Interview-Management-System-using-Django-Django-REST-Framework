@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Edit Job Role — InterviewIQ{% endblock %}
+{% block page_title %}Edit Job Role{% endblock %}
+{% block page_subtitle %}Update position details{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-xl-8">
+    <div class="ims-card">
+      <div class="ims-card-header">
+        <span class="ims-card-title">Edit: {{ role.title }}</span>
+        <a href="{% url 'candidates:job_roles' %}" style="font-size:13px;color:#64748b;text-decoration:none;"><i class="bi bi-arrow-left me-1"></i>Back</a>
+      </div>
+      <div class="ims-card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label fw-semibold" style="font-size:13px;">Job Title</label>
+              {{ form.title }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold" style="font-size:13px;">Department</label>
+              {{ form.department }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px;">Required Skills</label>
+              {{ form.required_skills }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px;">Job Description</label>
+              {{ form.job_description }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Minimum Experience (years)</label>
+              {{ form.minimum_experience }}
+            </div>
+            <div class="col-md-6 d-flex align-items-end pb-1">
+              <div class="form-check ms-2">
+                {{ form.is_active }}
+                <label class="form-check-label fw-semibold" style="font-size:13px;">Active</label>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn-ims btn"><i class="bi bi-check-circle me-1"></i>Save Changes</button>
+            <a href="{% url 'candidates:job_roles' %}" class="btn btn-light" style="border-radius:8px;">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

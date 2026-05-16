@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}My Profile — InterviewIQ{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+{% block page_subtitle %}Manage your personal information{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <!-- Profile Card -->
+  <div class="col-lg-4">
+    <div class="ims-card">
+      <div class="ims-card-body text-center" style="padding:36px 24px;">
+        <div style="width:90px;height:90px;border-radius:50%;background:#4f46e5;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:#fff;margin:0 auto 16px;overflow:hidden;">
+          {% if user.profile_image %}
+            <img src="{{ user.profile_image.url }}" style="width:100%;height:100%;object-fit:cover;" alt="Profile">
+          {% else %}
+            {{ user.get_initials }}
+          {% endif %}
+        </div>
+        <h5 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;color:#0f172a;margin-bottom:4px;">
+          {{ user.get_full_name|default:"No Name" }}
+        </h5>
+        <span class="badge mb-3
+          {% if user.is_hr_admin %}role-hr{% elif user.is_interviewer %}role-interviewer{% else %}role-candidate{% endif %}
+          px-3 py-2">
+          {{ user.get_role_display }}
+        </span>
+        <div style="font-size:13px;color:#64748b;">
+          {% if user.department %}<div class="mb-1"><i class="bi bi-building me-1"></i>{{ user.get_department_display }}</div>{% endif %}
+          {% if user.phone_number %}<div class="mb-1"><i class="bi bi-telephone me-1"></i>{{ user.phone_number }}</div>{% endif %}
+          <div><i class="bi bi-envelope me-1"></i>{{ user.email }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Form -->
+  <div class="col-lg-8">
+    <div class="ims-card">
+      <div class="ims-card-header">
+        <span class="ims-card-title">Edit Profile</span>
+      </div>
+      <div class="ims-card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">First Name</label>
+              {{ form.first_name }}
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Last Name</label>
+              {{ form.last_name }}
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Phone Number</label>
+              {{ form.phone_number }}
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Department</label>
+              {{ form.department }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px;">Bio</label>
+              {{ form.bio }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px;">LinkedIn URL</label>
+              {{ form.linkedin_url }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px;">Profile Image</label>
+              {{ form.profile_image }}
+            </div>
+          </div>
+          <div class="mt-4">
+            <button type="submit" class="btn-ims">
+              <i class="bi bi-check-circle me-1"></i> Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

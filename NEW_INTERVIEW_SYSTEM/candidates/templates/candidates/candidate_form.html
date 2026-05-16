@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Candidate — InterviewIQ{% endblock %}
+{% block page_title %}{{ action }} Candidate{% endblock %}
+{% block page_subtitle %}{% if action == 'Add' %}Add a new candidate to the pipeline{% else %}Update candidate information{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-xl-9">
+    <div class="ims-card">
+      <div class="ims-card-header">
+        <span class="ims-card-title"><i class="bi bi-person-plus me-2 text-primary"></i>{{ action }} Candidate</span>
+        <a href="{% url 'candidates:list' %}" style="font-size:13px;color:#64748b;text-decoration:none;">
+          <i class="bi bi-arrow-left me-1"></i>Back to list
+        </a>
+      </div>
+      <div class="ims-card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <!-- Section: Personal Info -->
+          <div class="mb-4">
+            <h6 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;color:#0f172a;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid #eef2ff;">
+              <i class="bi bi-person me-2 text-primary"></i>Personal Information
+            </h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold" style="font-size:13px;">Full Name *</label>
+                {{ form.full_name }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold" style="font-size:13px;">Email *</label>
+                {{ form.email }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold" style="font-size:13px;">Phone</label>
+                {{ form.phone }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold" style="font-size:13px;">Applied Role</label>
+                {{ form.applied_role }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Professional Info -->
+          <div class="mb-4">
+            <h6 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;color:#0f172a;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid #eef2ff;">
+              <i class="bi bi-briefcase me-2 text-primary"></i>Professional Information
+            </h6>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label fw-semibold" style="font-size:13px;">Skills <span style="color:#94a3b8;">(comma-separated)</span></label>
+                {{ form.skills }}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold" style="font-size:13px;">Experience (years)</label>
+                {{ form.experience }}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold" style="font-size:13px;">Current Company</label>
+                {{ form.current_company }}
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold" style="font-size:13px;">Notice Period (days)</label>
+                {{ form.notice_period }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold" style="font-size:13px;">Current CTC (LPA)</label>
+                {{ form.current_ctc }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold" style="font-size:13px;">Expected CTC (LPA)</label>
+                {{ form.expected_ctc }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Online Presence -->
+          <div class="mb-4">
+            <h6 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;color:#0f172a;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid #eef2ff;">
+              <i class="bi bi-link-45deg me-2 text-primary"></i>Online Presence & Documents
+            </h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold" style="font-size:13px;">LinkedIn Profile</label>
+                {{ form.linkedin_profile }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold" style="font-size:13px;">GitHub Profile</label>
+                {{ form.github_profile }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold" style="font-size:13px;">Resume (PDF/DOC)</label>
+                {{ form.resume }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold" style="font-size:13px;">Source</label>
+                {{ form.source }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Status & Remarks -->
+          <div class="mb-4">
+            <h6 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;color:#0f172a;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid #eef2ff;">
+              <i class="bi bi-flag me-2 text-primary"></i>Status & Notes
+            </h6>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label fw-semibold" style="font-size:13px;">Pipeline Status</label>
+                {{ form.status }}
+              </div>
+              <div class="col-md-8">
+                <label class="form-label fw-semibold" style="font-size:13px;">Remarks / Notes</label>
+                {{ form.remarks }}
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn-ims btn">
+              <i class="bi bi-check-circle me-1"></i>{{ action }} Candidate
+            </button>
+            <a href="{% url 'candidates:list' %}" class="btn btn-light" style="border-radius:8px;font-weight:600;">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block title %}My Dashboard — InterviewIQ{% endblock %}
+{% block page_title %}My Application{% endblock %}
+{% block page_subtitle %}Track your hiring journey{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'candidates:apply' %}" class="btn-ims btn">
+  <i class="bi bi-pencil me-1"></i> Update Application
+</a>
+{% endblock %}
+
+{% block content %}
+{% if not candidate %}
+<div class="ims-card" style="text-align:center;padding:80px 32px;">
+  <i class="bi bi-send-fill" style="font-size:56px;color:#4f46e5;display:block;margin-bottom:20px;"></i>
+  <h4 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;color:#0f172a;margin-bottom:8px;">No Application Yet</h4>
+  <p style="color:#64748b;margin-bottom:24px;">You haven't applied for any position yet. Start your journey!</p>
+  <a href="{% url 'candidates:apply' %}" class="btn-ims btn">
+    <i class="bi bi-send me-1"></i> Apply Now
+  </a>
+</div>
+{% else %}
+
+<!-- Application Status Banner -->
+<div class="mb-4 p-4 rounded-3 d-flex align-items-center gap-4"
+     style="background:linear-gradient(135deg,#0f172a,#1e1b4b);color:#fff;">
+  <div style="font-size:48px;">
+    {% if candidate.status == 'selected' %}🎉{% elif candidate.status == 'rejected' %}😞{% else %}🚀{% endif %}
+  </div>
+  <div>
+    <div style="font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Application Status</div>
+    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:24px;font-weight:800;margin:4px 0;">
+      {{ candidate.get_status_display }}
+    </div>
+    <div style="font-size:13px;color:#94a3b8;">
+      Applied for: {{ candidate.applied_role.title|default:"Position not set" }}
+    </div>
+  </div>
+  <div class="ms-auto text-end">
+    <div style="font-size:13px;color:#94a3b8;">AI Resume Score</div>
+    <div style="font-size:36px;font-weight:800;color:#a5b4fc;">{{ candidate.ai_resume_score }}%</div>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="ims-stat">
+      <div class="ims-stat-icon" style="background:#eef2ff;color:#4f46e5;"><i class="bi bi-camera-video-fill"></i></div>
+      <div>
+        <div class="ims-stat-value">{{ total_interviews }}</div>
+        <div class="ims-stat-label">Total Interviews</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="ims-stat">
+      <div class="ims-stat-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-check2-all"></i></div>
+      <div>
+        <div class="ims-stat-value">{{ completed_interviews }}</div>
+        <div class="ims-stat-label">Completed</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="ims-stat">
+      <div class="ims-stat-icon" style="background:#fff7ed;color:#ea580c;"><i class="bi bi-clock-fill"></i></div>
+      <div>
+        <div class="ims-stat-value">{{ candidate.notice_period }}</div>
+        <div class="ims-stat-label">Notice Period (days)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <!-- Profile Summary -->
+  <div class="col-lg-4">
+    <div class="ims-card">
+      <div class="ims-card-header">
+        <span class="ims-card-title">Profile Summary</span>
+        <a href="{% url 'candidates:apply' %}" style="font-size:12px;color:#4f46e5;font-weight:600;text-decoration:none;">Edit</a>
+      </div>
+      <div class="ims-card-body">
+        <div class="mb-3">
+          <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:.5px;margin-bottom:4px;">Skills</div>
+          <div>
+            {% for skill in candidate.get_skills_list %}
+            <span class="badge me-1 mb-1" style="background:#eef2ff;color:#4f46e5;font-weight:500;font-size:11px;padding:4px 10px;border-radius:99px;">{{ skill }}</span>
+            {% empty %}
+            <span style="font-size:13px;color:#94a3b8;">No skills listed</span>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="mb-2">
+          <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:.5px;margin-bottom:2px;">Experience</div>
+          <div style="font-size:14px;font-weight:600;">{{ candidate.experience }} years</div>
+        </div>
+        {% if candidate.current_company %}
+        <div class="mb-2">
+          <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:.5px;margin-bottom:2px;">Current Company</div>
+          <div style="font-size:14px;font-weight:600;">{{ candidate.current_company }}</div>
+        </div>
+        {% endif %}
+        {% if candidate.resume %}
+        <a href="{{ candidate.resume.url }}" target="_blank" class="btn btn-sm mt-3 w-100" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:600;">
+          <i class="bi bi-file-earmark-text me-1"></i> View Resume
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Interview Timeline -->
+  <div class="col-lg-8">
+    <div class="ims-card">
+      <div class="ims-card-header">
+        <span class="ims-card-title">Interview Timeline</span>
+      </div>
+      <div class="ims-card-body">
+        {% if interviews %}
+        <div class="ims-timeline">
+          {% for interview in interviews %}
+          <div class="ims-timeline-item">
+            <div class="ims-timeline-dot" style="background:{% if interview.status == 'completed' %}#10b981{% elif interview.status == 'scheduled' %}#4f46e5{% elif interview.status == 'cancelled' %}#ef4444{% else %}#94a3b8{% endif %};"></div>
+            <div class="d-flex align-items-start justify-content-between">
+              <div>
+                <div class="fw-semibold" style="font-size:14px;color:#0f172a;">{{ interview.get_round_type_display }}</div>
+                <div style="font-size:12px;color:#64748b;margin-top:2px;">
+                  <i class="bi bi-calendar3 me-1"></i>{{ interview.scheduled_at|date:"d M Y, h:i A" }}
+                  {% if interview.interviewer %}· <i class="bi bi-person me-1"></i>{{ interview.interviewer.get_full_name }}{% endif %}
+                </div>
+                {% if interview.mode == 'online' and interview.meeting_link %}
+                <a href="{{ interview.meeting_link }}" target="_blank" class="btn btn-sm mt-2" style="background:#4f46e5;color:#fff;border-radius:6px;font-size:11px;padding:3px 10px;">
+                  <i class="bi bi-camera-video me-1"></i>Join
+                </a>
+                {% endif %}
+              </div>
+              <span class="badge {{ interview.get_status_badge }} px-2 py-1" style="font-size:11px;">{{ interview.get_status_display }}</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="ims-empty">
+          <i class="bi bi-calendar2-x"></i>
+          No interviews scheduled yet.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

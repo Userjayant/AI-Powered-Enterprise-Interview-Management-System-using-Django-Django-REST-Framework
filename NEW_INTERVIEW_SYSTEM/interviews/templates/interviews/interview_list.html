@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block title %}Interviews — InterviewIQ{% endblock %}
+{% block page_title %}Interviews{% endblock %}
+{% block page_subtitle %}{{ upcoming_count }} upcoming scheduled{% endblock %}
+
+{% block topbar_actions %}
+{% if not user.is_candidate %}
+<a href="{% url 'interviews:schedule' %}" class="btn-ims btn"><i class="bi bi-calendar-plus me-1"></i>Schedule</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<!-- Filters -->
+<div class="ims-card mb-3">
+  <div class="ims-card-body" style="padding:14px 20px;">
+    <form method="get" class="d-flex flex-wrap gap-2 align-items-center">
+      {% if not user.is_candidate %}
+      <div class="input-group input-group-sm" style="max-width:240px;">
+        <span class="input-group-text" style="border-radius:8px 0 0 8px;border-color:#e2e8f0;background:#f8fafc;"><i class="bi bi-search" style="color:#94a3b8;"></i></span>
+        <input type="text" name="q" value="{{ filters.q }}" class="form-control form-control-sm" placeholder="Search candidate..." style="border-radius:0 8px 8px 0;border-color:#e2e8f0;">
+      </div>
+      {% endif %}
+      <select name="status" class="form-select form-select-sm" style="width:auto;border-radius:8px;border-color:#e2e8f0;">
+        <option value="">All Status</option>
+        {% for val, label in status_choices %}
+        <option value="{{ val }}" {% if filters.status == val %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <select name="round" class="form-select form-select-sm" style="width:auto;border-radius:8px;border-color:#e2e8f0;">
+        <option value="">All Rounds</option>
+        {% for val, label in round_choices %}
+        <option value="{{ val }}" {% if filters.round == val %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-sm btn-ims">Filter</button>
+      {% if filters.status or filters.round or filters.q %}
+      <a href="{% url 'interviews:list' %}" class="btn btn-sm btn-light" style="border-radius:8px;">Clear</a>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<!-- Interview Table -->
+<div class="ims-card">
+  <div style="overflow-x:auto;">
+    <table class="ims-table">
+      <thead>
+        <tr>
+          <th>Candidate</th>
+          <th>Round</th>
+          <th>Interviewer</th>
+          <th>Date & Time</th>
+          <th>Duration</th>
+          <th>Mode</th>
+          <th>Status</th>
+          <th>Feedback</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for interview in interviews %}
+        <tr>
+          <td>
+            <div class="fw-semibold" style="font-size:13px;color:#0f172a;">{{ interview.candidate.full_name }}</div>
+            <div style="font-size:11px;color:#94a3b8;">{{ interview.candidate.applied_role.title|default:"N/A" }}</div>
+          </td>
+          <td>
+            <span style="font-size:12px;font-weight:600;background:#eef2ff;color:#4f46e5;padding:3px 10px;border-radius:99px;">
+              {{ interview.get_round_type_display }}
+            </span>
+          </td>
+          <td style="font-size:13px;">{{ interview.interviewer.get_full_name|default:"TBD" }}</td>
+          <td>
+            <div style="font-size:13px;font-weight:500;">{{ interview.scheduled_at|date:"d M Y" }}</div>
+            <div style="font-size:11px;color:#64748b;">{{ interview.scheduled_at|date:"h:i A" }}</div>
+          </td>
+          <td style="font-size:12px;color:#64748b;">{{ interview.duration }} min</td>
+          <td>
+            <span style="font-size:12px;">
+              {% if interview.mode == 'online' %}<i class="bi bi-camera-video text-primary"></i>{% elif interview.mode == 'phone' %}<i class="bi bi-telephone text-success"></i>{% else %}<i class="bi bi-building text-warning"></i>{% endif %}
+              {{ interview.get_mode_display }}
+            </span>
+          </td>
+          <td>
+            <span class="badge {{ interview.get_status_badge }}" style="font-size:11px;padding:4px 10px;border-radius:99px;">
+              {{ interview.get_status_display }}
+            </span>
+          </td>
+          <td>
+            {% if interview.has_feedback %}
+            <span style="font-size:13px;font-weight:700;color:#059669;">
+              {{ interview.feedback.overall_score }}/10
+            </span>
+            {% elif interview.status == 'completed' %}
+            {% if user.is_interviewer or user.is_hr_admin %}
+            <a href="{% url 'interviews:detail' interview.pk %}" style="font-size:12px;color:#ca8a04;font-weight:600;text-decoration:none;">
+              <i class="bi bi-pencil me-1"></i>Submit
+            </a>
+            {% else %}
+            <span style="font-size:12px;color:#94a3b8;">Pending</span>
+            {% endif %}
+            {% else %}
+            <span style="font-size:12px;color:#94a3b8;">—</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="d-flex gap-1">
+              <a href="{% url 'interviews:detail' interview.pk %}" class="btn btn-sm" style="background:#eef2ff;color:#4f46e5;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;">
+                <i class="bi bi-eye"></i>
+              </a>
+              {% if interview.mode == 'online' and interview.meeting_link %}
+              <a href="{{ interview.meeting_link }}" target="_blank" class="btn btn-sm" style="background:#ecfdf5;color:#059669;border-radius:6px;padding:4px 10px;font-size:12px;">
+                <i class="bi bi-camera-video"></i>
+              </a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="9">
+            <div class="ims-empty">
+              <i class="bi bi-calendar2-x"></i>
+              No interviews found.
+              {% if not user.is_candidate %}
+              <a href="{% url 'interviews:schedule' %}" style="color:#4f46e5;font-weight:600;">Schedule one →</a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if interviews.has_other_pages %}
+  <div class="d-flex justify-content-between align-items-center px-4 py-3" style="border-top:1px solid #f1f5f9;">
+    <span style="font-size:13px;color:#64748b;">
+      Showing {{ interviews.start_index }}–{{ interviews.end_index }} of {{ interviews.paginator.count }}
+    </span>
+    <nav>
+      <ul class="pagination pagination-sm mb-0 gap-1">
+        {% if interviews.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ interviews.previous_page_number }}" style="border-radius:6px;">‹</a></li>{% endif %}
+        {% for num in interviews.paginator.page_range %}
+        <li class="page-item {% if num == interviews.number %}active{% endif %}">
+          <a class="page-link" href="?page={{ num }}" style="border-radius:6px;">{{ num }}</a>
+        </li>
+        {% endfor %}
+        {% if interviews.has_next %}<li class="page-item"><a class="page-link" href="?page={{ interviews.next_page_number }}" style="border-radius:6px;">›</a></li>{% endif %}
+      </ul>
+    </nav>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

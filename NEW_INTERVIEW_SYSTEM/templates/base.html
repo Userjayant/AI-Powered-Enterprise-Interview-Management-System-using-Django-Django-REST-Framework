@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}IMS — Interview Management System{% endblock %}</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --ims-primary: #4f46e5;
+      --ims-primary-dark: #3730a3;
+      --ims-primary-light: #eef2ff;
+      --ims-secondary: #0ea5e9;
+      --ims-success: #10b981;
+      --ims-warning: #f59e0b;
+      --ims-danger: #ef4444;
+      --ims-sidebar-width: 260px;
+      --ims-sidebar-bg: #0f172a;
+      --ims-sidebar-text: #94a3b8;
+      --ims-sidebar-hover: rgba(255,255,255,0.08);
+      --ims-sidebar-active: rgba(79,70,229,0.25);
+      --ims-topbar-height: 64px;
+      --ims-font: 'Inter', sans-serif;
+      --ims-font-display: 'Plus Jakarta Sans', sans-serif;
+      --ims-radius: 12px;
+      --ims-shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.04);
+      --ims-shadow-md: 0 4px 16px rgba(0,0,0,.10);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body {
+      font-family: var(--ims-font);
+      background: #f8fafc;
+      color: #1e293b;
+      overflow-x: hidden;
+    }
+
+    /* ── SIDEBAR ── */
+    .ims-sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: var(--ims-sidebar-width);
+      height: 100vh;
+      background: var(--ims-sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      z-index: 1040;
+      transition: transform .3s ease;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .ims-sidebar::-webkit-scrollbar { width: 4px; }
+    .ims-sidebar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+    .ims-brand {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .ims-brand-icon {
+      width: 36px; height: 36px;
+      background: var(--ims-primary);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .ims-brand-text {
+      font-family: var(--ims-font-display);
+      font-weight: 800;
+      font-size: 15px;
+      color: #f1f5f9;
+      line-height: 1.2;
+    }
+    .ims-brand-sub {
+      font-size: 10px;
+      color: #64748b;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+    }
+
+    .ims-nav-section {
+      padding: 16px 0 4px;
+    }
+    .ims-nav-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      color: #475569;
+      padding: 0 20px 6px;
+    }
+
+    .ims-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 20px;
+      color: var(--ims-sidebar-text);
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      border-radius: 0;
+      transition: all .15s ease;
+      position: relative;
+    }
+    .ims-nav-link:hover {
+      background: var(--ims-sidebar-hover);
+      color: #e2e8f0;
+    }
+    .ims-nav-link.active {
+      background: var(--ims-sidebar-active);
+      color: #a5b4fc;
+    }
+    .ims-nav-link.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--ims-primary);
+      border-radius: 0 3px 3px 0;
+    }
+    .ims-nav-link i { font-size: 16px; width: 20px; text-align: center; }
+
+    .ims-sidebar-footer {
+      margin-top: auto;
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    .ims-user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.04);
+      text-decoration: none;
+      transition: background .15s;
+    }
+    .ims-user-pill:hover { background: rgba(255,255,255,.08); }
+    .ims-user-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: var(--ims-primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .ims-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .ims-user-name { font-size: 13px; font-weight: 600; color: #e2e8f0; }
+    .ims-user-role { font-size: 10px; color: #64748b; text-transform: capitalize; }
+
+    /* ── MAIN CONTENT ── */
+    .ims-main {
+      margin-left: var(--ims-sidebar-width);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── TOPBAR ── */
+    .ims-topbar {
+      height: var(--ims-topbar-height);
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      gap: 16px;
+    }
+    .ims-topbar-title {
+      font-family: var(--ims-font-display);
+      font-weight: 700;
+      font-size: 17px;
+      color: #0f172a;
+    }
+    .ims-topbar-sub {
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 400;
+    }
+    .ims-topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+    /* ── CONTENT AREA ── */
+    .ims-content {
+      flex: 1;
+      padding: 28px 28px;
+    }
+
+    /* ── CARDS ── */
+    .ims-card {
+      background: #fff;
+      border-radius: var(--ims-radius);
+      box-shadow: var(--ims-shadow);
+      border: 1px solid #f1f5f9;
+      overflow: hidden;
+    }
+    .ims-card-header {
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .ims-card-title {
+      font-family: var(--ims-font-display);
+      font-weight: 700;
+      font-size: 14px;
+      color: #0f172a;
+    }
+    .ims-card-body { padding: 20px 22px; }
+
+    /* ── STAT CARDS ── */
+    .ims-stat {
+      background: #fff;
+      border-radius: var(--ims-radius);
+      padding: 22px 24px;
+      box-shadow: var(--ims-shadow);
+      border: 1px solid #f1f5f9;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .ims-stat:hover { box-shadow: var(--ims-shadow-md); transform: translateY(-2px); }
+    .ims-stat-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .ims-stat-value {
+      font-family: var(--ims-font-display);
+      font-size: 28px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .ims-stat-label { font-size: 13px; color: #64748b; font-weight: 500; }
+    .ims-stat-change {
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    /* ── BADGE ROLE ── */
+    .role-hr { background: #eef2ff; color: #4f46e5; }
+    .role-interviewer { background: #ecfdf5; color: #059669; }
+    .role-candidate { background: #fff7ed; color: #ea580c; }
+
+    /* ── TABLES ── */
+    .ims-table { width: 100%; border-collapse: collapse; }
+    .ims-table th {
+      background: #f8fafc;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: #64748b;
+      padding: 10px 14px;
+      border-bottom: 1px solid #e2e8f0;
+      white-space: nowrap;
+    }
+    .ims-table td {
+      padding: 13px 14px;
+      font-size: 13.5px;
+      color: #334155;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .ims-table tr:last-child td { border-bottom: none; }
+    .ims-table tr:hover td { background: #fafbfc; }
+
+    /* ── BUTTONS ── */
+    .btn-ims {
+      background: var(--ims-primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all .15s;
+    }
+    .btn-ims:hover { background: var(--ims-primary-dark); color: #fff; }
+
+    /* ── SCORE BAR ── */
+    .score-bar-wrap { background: #f1f5f9; border-radius: 99px; height: 6px; }
+    .score-bar {
+      height: 6px; border-radius: 99px;
+      background: linear-gradient(90deg, var(--ims-primary), var(--ims-secondary));
+    }
+
+    /* ── PIPELINE BADGE ── */
+    .pipeline-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    /* ── ALERTS ── */
+    .ims-alert {
+      position: fixed;
+      top: 80px;
+      right: 24px;
+      z-index: 9999;
+      min-width: 300px;
+      max-width: 420px;
+    }
+
+    /* ── SIDEBAR TOGGLE (mobile) ── */
+    .ims-sidebar-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: #475569;
+      padding: 4px;
+    }
+
+    /* ── EMPTY STATE ── */
+    .ims-empty {
+      text-align: center;
+      padding: 64px 32px;
+      color: #94a3b8;
+    }
+    .ims-empty i { font-size: 48px; margin-bottom: 16px; display: block; }
+
+    /* ── TIMELINE ── */
+    .ims-timeline { position: relative; padding-left: 28px; }
+    .ims-timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px; top: 0; bottom: 0;
+      width: 2px;
+      background: #e2e8f0;
+    }
+    .ims-timeline-item { position: relative; margin-bottom: 20px; }
+    .ims-timeline-dot {
+      position: absolute;
+      left: -24px; top: 4px;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--ims-primary);
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 2px var(--ims-primary-light);
+    }
+
+    @media (max-width: 991px) {
+      .ims-sidebar { transform: translateX(-100%); }
+      .ims-sidebar.open { transform: translateX(0); }
+      .ims-main { margin-left: 0; }
+      .ims-sidebar-toggle { display: block; }
+      .ims-sidebar-backdrop {
+        display: none;
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,.4);
+        z-index: 1039;
+      }
+      .ims-sidebar-backdrop.show { display: block; }
+    }
+  </style>
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+
+<!-- Sidebar Backdrop (mobile) -->
+<div class="ims-sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+
+<!-- ── SIDEBAR ── -->
+<aside class="ims-sidebar" id="imsSidebar">
+  <a href="{% url 'dashboard:home' %}" class="ims-brand">
+    <div class="ims-brand-icon">💼</div>
+    <div>
+      <div class="ims-brand-text">InterviewIQ</div>
+      <div class="ims-brand-sub">Management System</div>
+    </div>
+  </a>
+
+  <nav style="flex:1; padding-top:8px;">
+
+    <!-- MAIN -->
+    <div class="ims-nav-section">
+      <div class="ims-nav-label">Main</div>
+      <a href="{% url 'dashboard:home' %}" class="ims-nav-link {% if request.resolver_match.namespace == 'dashboard' %}active{% endif %}">
+        <i class="bi bi-grid-1x2-fill"></i> Dashboard
+      </a>
+    </div>
+
+    {% if user.is_hr_admin %}
+    <!-- HR ADMIN MENU -->
+    <div class="ims-nav-section">
+      <div class="ims-nav-label">Recruitment</div>
+      <a href="{% url 'candidates:list' %}" class="ims-nav-link {% if 'candidates' in request.path and 'roles' not in request.path %}active{% endif %}">
+        <i class="bi bi-people-fill"></i> Candidates
+      </a>
+      <a href="{% url 'candidates:job_roles' %}" class="ims-nav-link {% if 'roles' in request.path %}active{% endif %}">
+        <i class="bi bi-briefcase-fill"></i> Job Roles
+      </a>
+      <a href="{% url 'interviews:list' %}" class="ims-nav-link {% if request.resolver_match.namespace == 'interviews' %}active{% endif %}">
+        <i class="bi bi-calendar2-check-fill"></i> Interviews
+      </a>
+      <a href="{% url 'interviews:schedule' %}" class="ims-nav-link">
+        <i class="bi bi-plus-circle-fill"></i> Schedule Interview
+      </a>
+    </div>
+    <div class="ims-nav-section">
+      <div class="ims-nav-label">Administration</div>
+      <a href="{% url 'accounts:create_staff' %}" class="ims-nav-link {% if 'staff' in request.path %}active{% endif %}">
+        <i class="bi bi-person-badge-fill"></i> Manage Staff
+      </a>
+      <a href="/api/" class="ims-nav-link">
+        <i class="bi bi-code-slash"></i> API Explorer
+      </a>
+      <a href="/admin/" class="ims-nav-link">
+        <i class="bi bi-gear-fill"></i> Django Admin
+      </a>
+    </div>
+
+    {% elif user.is_interviewer %}
+    <!-- INTERVIEWER MENU -->
+    <div class="ims-nav-section">
+      <div class="ims-nav-label">My Work</div>
+      <a href="{% url 'interviews:list' %}" class="ims-nav-link {% if request.resolver_match.namespace == 'interviews' %}active{% endif %}">
+        <i class="bi bi-calendar2-check-fill"></i> My Interviews
+      </a>
+    </div>
+
+    {% else %}
+    <!-- CANDIDATE MENU -->
+    <div class="ims-nav-section">
+      <div class="ims-nav-label">My Application</div>
+      <a href="{% url 'candidates:apply' %}" class="ims-nav-link {% if 'apply' in request.path %}active{% endif %}">
+        <i class="bi bi-send-fill"></i> My Application
+      </a>
+      <a href="{% url 'interviews:list' %}" class="ims-nav-link {% if request.resolver_match.namespace == 'interviews' %}active{% endif %}">
+        <i class="bi bi-camera-video-fill"></i> My Interviews
+      </a>
+    </div>
+    {% endif %}
+
+    <!-- COMMON -->
+    <div class="ims-nav-section">
+      <div class="ims-nav-label">Account</div>
+      <a href="{% url 'accounts:profile' %}" class="ims-nav-link {% if 'profile' in request.path %}active{% endif %}">
+        <i class="bi bi-person-circle"></i> Profile
+      </a>
+      <a href="{% url 'accounts:logout' %}" class="ims-nav-link">
+        <i class="bi bi-box-arrow-left"></i> Logout
+      </a>
+    </div>
+  </nav>
+
+  <!-- User Footer -->
+  <div class="ims-sidebar-footer">
+    <a href="{% url 'accounts:profile' %}" class="ims-user-pill">
+      <div class="ims-user-avatar">
+        {% if user.profile_image %}
+          <img src="{{ user.profile_image.url }}" alt="Avatar" />
+        {% else %}
+          {{ user.get_initials }}
+        {% endif %}
+      </div>
+      <div>
+        <div class="ims-user-name">{{ user.get_full_name|default:user.email|truncatechars:20 }}</div>
+        <div class="ims-user-role">{{ user.get_role_display }}</div>
+      </div>
+    </a>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="ims-main">
+  <!-- Topbar -->
+  <header class="ims-topbar">
+    <button class="ims-sidebar-toggle" onclick="toggleSidebar()">
+      <i class="bi bi-list"></i>
+    </button>
+    <div>
+      <div class="ims-topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
+      <div class="ims-topbar-sub">{% block page_subtitle %}{% endblock %}</div>
+    </div>
+    <div class="ims-topbar-actions">
+      {% block topbar_actions %}{% endblock %}
+      <span class="badge rounded-pill px-3 py-2 fs-6
+        {% if user.is_hr_admin %}role-hr{% elif user.is_interviewer %}role-interviewer{% else %}role-candidate{% endif %}">
+        <i class="bi bi-shield-check me-1"></i>{{ user.get_role_display }}
+      </span>
+    </div>
+  </header>
+
+  <!-- Django Messages -->
+  {% if messages %}
+  <div class="ims-alert" id="alertContainer">
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm" role="alert" style="border-radius:10px; border:none;">
+      <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}-fill me-2"></i>
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Page Content -->
+  <main class="ims-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer style="padding:16px 28px; font-size:12px; color:#94a3b8; border-top:1px solid #f1f5f9; background:#fff;">
+    © 2025 InterviewIQ · AI-Powered Interview Management System
+  </footer>
+</div>
+
+{% else %}
+<!-- Not authenticated - render standalone -->
+{% block standalone_content %}{% endblock %}
+{% endif %}
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // Sidebar toggle
+  function toggleSidebar() {
+    document.getElementById('imsSidebar').classList.toggle('open');
+    document.getElementById('sidebarBackdrop').classList.toggle('show');
+  }
+  function closeSidebar() {
+    document.getElementById('imsSidebar').classList.remove('open');
+    document.getElementById('sidebarBackdrop').classList.remove('show');
+  }
+
+  // Auto-dismiss alerts after 5s
+  setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(el => {
+      let alert = bootstrap.Alert.getOrCreateInstance(el);
+      alert.close();
+    });
+  }, 5000);
+</script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

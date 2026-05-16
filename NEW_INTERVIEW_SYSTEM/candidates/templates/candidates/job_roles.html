@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block title %}Job Roles — InterviewIQ{% endblock %}
+{% block page_title %}Job Roles{% endblock %}
+{% block page_subtitle %}Manage open positions and job descriptions{% endblock %}
+
+{% block topbar_actions %}
+<button class="btn-ims btn" data-bs-toggle="modal" data-bs-target="#addRoleModal">
+  <i class="bi bi-plus-circle me-1"></i>Add Role
+</button>
+{% endblock %}
+
+{% block content %}
+
+<!-- Search -->
+<div class="ims-card mb-3">
+  <div class="ims-card-body" style="padding:14px 20px;">
+    <form method="get" class="d-flex gap-2">
+      <div class="input-group input-group-sm" style="max-width:320px;">
+        <span class="input-group-text" style="border-radius:8px 0 0 8px;border-color:#e2e8f0;background:#f8fafc;"><i class="bi bi-search" style="color:#94a3b8;"></i></span>
+        <input type="text" name="q" value="{{ query }}" class="form-control form-control-sm" placeholder="Search roles..." style="border-radius:0 8px 8px 0;border-color:#e2e8f0;">
+      </div>
+      <button type="submit" class="btn btn-sm btn-ims">Search</button>
+      {% if query %}<a href="{% url 'candidates:job_roles' %}" class="btn btn-sm btn-light" style="border-radius:8px;">Clear</a>{% endif %}
+    </form>
+  </div>
+</div>
+
+<!-- Role Cards Grid -->
+<div class="row g-3">
+  {% for role in roles %}
+  <div class="col-md-6 col-xl-4">
+    <div class="ims-card h-100">
+      <div class="ims-card-body" style="padding:20px;">
+        <div class="d-flex align-items-start justify-content-between mb-3">
+          <div>
+            <h6 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;color:#0f172a;margin-bottom:4px;font-size:15px;">{{ role.title }}</h6>
+            <span style="font-size:12px;color:#64748b;"><i class="bi bi-building me-1"></i>{{ role.department }}</span>
+          </div>
+          <span class="badge {% if role.is_active %}bg-success{% else %}bg-secondary{% endif %}" style="font-size:11px;padding:4px 10px;border-radius:99px;">
+            {% if role.is_active %}Active{% else %}Inactive{% endif %}
+          </span>
+        </div>
+
+        <div class="mb-3" style="font-size:13px;color:#334155;line-height:1.6;">
+          {{ role.job_description|truncatewords:20 }}
+        </div>
+
+        <div class="mb-3">
+          <div style="font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;">Required Skills</div>
+          <div class="d-flex flex-wrap gap-1">
+            {% for skill in role.get_skills_list|slice:":5" %}
+            <span class="badge" style="background:#eef2ff;color:#4f46e5;font-size:11px;padding:3px 8px;border-radius:99px;font-weight:500;">{{ skill }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center pt-3" style="border-top:1px solid #f1f5f9;">
+          <div style="font-size:12px;color:#64748b;">
+            <i class="bi bi-people me-1"></i>{{ role.candidates.count }} applicants ·
+            <i class="bi bi-clock me-1 ms-1"></i>{{ role.minimum_experience }}+ yrs
+          </div>
+          <div class="d-flex gap-1">
+            <a href="{% url 'candidates:job_role_edit' role.pk %}" class="btn btn-sm" style="background:#fefce8;color:#ca8a04;border-radius:6px;padding:4px 10px;font-size:12px;">
+              <i class="bi bi-pencil"></i>
+            </a>
+            <form method="post" action="{% url 'candidates:job_role_delete' role.pk %}" style="display:inline;" onsubmit="return confirm('Delete this role?');">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm" style="background:#fef2f2;color:#ef4444;border-radius:6px;padding:4px 10px;font-size:12px;border:none;">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="ims-empty">
+      <i class="bi bi-briefcase"></i>
+      No job roles found. <button class="btn btn-sm btn-ims ms-2" data-bs-toggle="modal" data-bs-target="#addRoleModal">Create one →</button>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if roles.has_other_pages %}
+<div class="d-flex justify-content-center mt-4">
+  <nav>
+    <ul class="pagination pagination-sm mb-0 gap-1">
+      {% if roles.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ roles.previous_page_number }}" style="border-radius:6px;">‹</a></li>{% endif %}
+      {% for num in roles.paginator.page_range %}
+      <li class="page-item {% if num == roles.number %}active{% endif %}">
+        <a class="page-link" href="?page={{ num }}" style="border-radius:6px;">{{ num }}</a>
+      </li>
+      {% endfor %}
+      {% if roles.has_next %}<li class="page-item"><a class="page-link" href="?page={{ roles.next_page_number }}" style="border-radius:6px;">›</a></li>{% endif %}
+    </ul>
+  </nav>
+</div>
+{% endif %}
+
+<!-- Add Role Modal -->
+<div class="modal fade" id="addRoleModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 20px 60px rgba(0,0,0,.15);">
+      <div class="modal-header" style="border-bottom:1px solid #f1f5f9;padding:20px 24px;">
+        <h5 class="modal-title fw-bold">Create Job Role</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="padding:24px;">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label fw-semibold" style="font-size:13px;">Job Title *</label>
+              {{ form.title }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold" style="font-size:13px;">Department *</label>
+              {{ form.department }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px;">Required Skills <span style="color:#94a3b8;">(comma-separated)</span></label>
+              {{ form.required_skills }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px;">Job Description</label>
+              {{ form.job_description }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Minimum Experience (years)</label>
+              {{ form.minimum_experience }}
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+              <div class="form-check ms-2">
+                {{ form.is_active }}
+                <label class="form-check-label fw-semibold" style="font-size:13px;">Active / Accepting Applications</label>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn-ims btn"><i class="bi bi-briefcase me-1"></i>Create Role</button>
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius:8px;">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

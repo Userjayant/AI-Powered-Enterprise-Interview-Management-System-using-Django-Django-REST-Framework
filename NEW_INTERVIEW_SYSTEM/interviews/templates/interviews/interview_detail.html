@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+{% block title %}Interview Detail — InterviewIQ{% endblock %}
+{% block page_title %}Interview Details{% endblock %}
+{% block page_subtitle %}{{ interview.get_round_type_display }} · {{ interview.scheduled_at|date:"d M Y" }}{% endblock %}
+
+{% block topbar_actions %}
+{% if user.is_hr_admin %}
+<button class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#updateModal" style="border-radius:8px;font-weight:600;">
+  <i class="bi bi-pencil me-1"></i>Edit
+</button>
+<form method="post" action="{% url 'interviews:delete' interview.pk %}" style="display:inline;" onsubmit="return confirm('Delete this interview?');">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-sm btn-outline-danger" style="border-radius:8px;font-weight:600;">
+    <i class="bi bi-trash me-1"></i>Delete
+  </button>
+</form>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+  <!-- LEFT: Interview Info -->
+  <div class="col-lg-5">
+    <!-- Status Card -->
+    <div class="ims-card mb-3">
+      <div class="ims-card-body" style="padding:24px;">
+        <div class="d-flex align-items-center gap-3 mb-4">
+          <div style="width:56px;height:56px;border-radius:14px;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-size:24px;">
+            {% if interview.mode == 'online' %}🎥{% elif interview.mode == 'phone' %}📞{% else %}🏢{% endif %}
+          </div>
+          <div>
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:800;color:#0f172a;">{{ interview.get_round_type_display }}</div>
+            <span class="badge {{ interview.get_status_badge }}" style="font-size:12px;padding:4px 12px;border-radius:99px;margin-top:4px;">{{ interview.get_status_display }}</span>
+          </div>
+        </div>
+
+        <div class="mb-3 p-3 rounded-3" style="background:#f8fafc;border:1px solid #e2e8f0;">
+          <div class="row g-2 text-center">
+            <div class="col-6">
+              <div style="font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Date</div>
+              <div style="font-size:14px;font-weight:700;color:#0f172a;margin-top:2px;">{{ interview.scheduled_at|date:"d M Y" }}</div>
+            </div>
+            <div class="col-6">
+              <div style="font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Time</div>
+              <div style="font-size:14px;font-weight:700;color:#0f172a;margin-top:2px;">{{ interview.scheduled_at|date:"h:i A" }}</div>
+            </div>
+            <div class="col-6">
+              <div style="font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Duration</div>
+              <div style="font-size:14px;font-weight:700;color:#0f172a;margin-top:2px;">{{ interview.duration }} min</div>
+            </div>
+            <div class="col-6">
+              <div style="font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Mode</div>
+              <div style="font-size:14px;font-weight:700;color:#0f172a;margin-top:2px;">{{ interview.get_mode_display }}</div>
+            </div>
+          </div>
+        </div>
+
+        {% if interview.meeting_link %}
+        <a href="{{ interview.meeting_link }}" target="_blank" class="btn w-100 mb-2" style="background:#4f46e5;color:#fff;border-radius:10px;font-size:14px;font-weight:700;padding:12px;">
+          <i class="bi bi-camera-video-fill me-2"></i>Join Meeting
+        </a>
+        {% endif %}
+        {% if interview.location %}
+        <div class="text-center" style="font-size:13px;color:#64748b;">
+          <i class="bi bi-geo-alt me-1"></i>{{ interview.location }}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Participants -->
+    <div class="ims-card mb-3">
+      <div class="ims-card-header"><span class="ims-card-title">Participants</span></div>
+      <div class="ims-card-body">
+        <!-- Candidate -->
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#0ea5e9);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;">
+            {{ interview.candidate.full_name|slice:":1"|upper }}
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#0f172a;">{{ interview.candidate.full_name }}</div>
+            <div style="font-size:11px;color:#94a3b8;">Candidate · {{ interview.candidate.applied_role.title|default:"N/A" }}</div>
+          </div>
+          <a href="{% url 'candidates:detail' interview.candidate.pk %}" style="margin-left:auto;font-size:12px;color:#4f46e5;font-weight:600;text-decoration:none;">View →</a>
+        </div>
+
+        <!-- Interviewer -->
+        <div class="d-flex align-items-center gap-3">
+          <div style="width:40px;height:40px;border-radius:50%;background:#ecfdf5;border:2px solid #d1fae5;display:flex;align-items:center;justify-content:center;font-size:14px;color:#059669;">
+            <i class="bi bi-person-check-fill"></i>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#0f172a;">{{ interview.interviewer.get_full_name|default:"Not Assigned" }}</div>
+            <div style="font-size:11px;color:#94a3b8;">Interviewer · {{ interview.interviewer.department|default:"N/A" }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    {% if interview.notes %}
+    <div class="ims-card">
+      <div class="ims-card-header"><span class="ims-card-title">Internal Notes</span></div>
+      <div class="ims-card-body">
+        <p style="font-size:13px;color:#334155;line-height:1.7;margin:0;">{{ interview.notes }}</p>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- RIGHT: Feedback -->
+  <div class="col-lg-7">
+    {% if feedback %}
+    <!-- Feedback Display -->
+    <div class="ims-card mb-3">
+      <div class="ims-card-header">
+        <span class="ims-card-title">Interview Feedback</span>
+        <span class="badge {{ feedback.get_recommendation_badge }} px-3 py-2">{{ feedback.get_recommendation_display }}</span>
+      </div>
+      <div class="ims-card-body">
+        <!-- Overall Score -->
+        <div class="text-center mb-4 p-4 rounded-3" style="background:linear-gradient(135deg,#0f172a,#1e1b4b);">
+          <div style="font-size:12px;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;font-weight:600;">Overall Score</div>
+          <div style="font-size:52px;font-weight:800;color:{% if feedback.overall_score >= 7 %}#34d399{% elif feedback.overall_score >= 5 %}#fbbf24{% else %}#f87171{% endif %};line-height:1.1;margin:8px 0;">
+            {{ feedback.overall_score }}
+          </div>
+          <div style="font-size:13px;color:#64748b;">out of 10.0</div>
+        </div>
+
+        <!-- Score Breakdown -->
+        <div class="row g-3 mb-4">
+          {% with scores=feedback %}
+          <div class="col-6">
+            <div style="font-size:12px;color:#64748b;font-weight:600;margin-bottom:6px;">Technical</div>
+            <div class="d-flex align-items-center gap-2">
+              <div class="score-bar-wrap" style="flex:1;">
+                <div class="score-bar" style="width:{{ scores.technical_score }}0%;"></div>
+              </div>
+              <span style="font-size:13px;font-weight:700;">{{ scores.technical_score }}/10</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div style="font-size:12px;color:#64748b;font-weight:600;margin-bottom:6px;">Communication</div>
+            <div class="d-flex align-items-center gap-2">
+              <div class="score-bar-wrap" style="flex:1;">
+                <div class="score-bar" style="width:{{ scores.communication_score }}0%;"></div>
+              </div>
+              <span style="font-size:13px;font-weight:700;">{{ scores.communication_score }}/10</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div style="font-size:12px;color:#64748b;font-weight:600;margin-bottom:6px;">Problem Solving</div>
+            <div class="d-flex align-items-center gap-2">
+              <div class="score-bar-wrap" style="flex:1;">
+                <div class="score-bar" style="width:{{ scores.problem_solving_score }}0%;"></div>
+              </div>
+              <span style="font-size:13px;font-weight:700;">{{ scores.problem_solving_score }}/10</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div style="font-size:12px;color:#64748b;font-weight:600;margin-bottom:6px;">Confidence</div>
+            <div class="d-flex align-items-center gap-2">
+              <div class="score-bar-wrap" style="flex:1;">
+                <div class="score-bar" style="width:{{ scores.confidence_score }}0%;"></div>
+              </div>
+              <span style="font-size:13px;font-weight:700;">{{ scores.confidence_score }}/10</span>
+            </div>
+          </div>
+          {% endwith %}
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="p-3 rounded-3" style="background:#ecfdf5;border:1px solid #d1fae5;">
+              <div style="font-size:11px;font-weight:700;color:#065f46;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;"><i class="bi bi-check-circle-fill me-1"></i>Strengths</div>
+              <p style="font-size:13px;color:#064e3b;margin:0;line-height:1.6;">{{ feedback.strengths }}</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="p-3 rounded-3" style="background:#fef2f2;border:1px solid #fecaca;">
+              <div style="font-size:11px;font-weight:700;color:#991b1b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;"><i class="bi bi-exclamation-circle-fill me-1"></i>Areas to Improve</div>
+              <p style="font-size:13px;color:#7f1d1d;margin:0;line-height:1.6;">{{ feedback.weaknesses }}</p>
+            </div>
+          </div>
+          <div class="col-12">
+            <div style="font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;">Detailed Comments</div>
+            <p style="font-size:13px;color:#334155;line-height:1.7;margin:0;">{{ feedback.comments }}</p>
+          </div>
+        </div>
+        <div class="mt-3 pt-3" style="border-top:1px solid #f1f5f9;font-size:12px;color:#94a3b8;">
+          Submitted by {{ feedback.submitted_by.get_full_name }} · {{ feedback.created_at|date:"d M Y, h:i A" }}
+        </div>
+      </div>
+    </div>
+
+    {% elif interview.status == 'completed' and not user.is_candidate %}
+    <!-- Feedback Form -->
+    <div class="ims-card">
+      <div class="ims-card-header">
+        <span class="ims-card-title"><i class="bi bi-pencil-square me-2 text-primary"></i>Submit Feedback</span>
+      </div>
+      <div class="ims-card-body">
+        <form method="post" action="{% url 'interviews:feedback_submit' interview.pk %}">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Technical Score (0–10)</label>
+              {{ feedback_form.technical_score }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Communication Score (0–10)</label>
+              {{ feedback_form.communication_score }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Problem Solving Score (0–10)</label>
+              {{ feedback_form.problem_solving_score }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Confidence Score (0–10)</label>
+              {{ feedback_form.confidence_score }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Strengths</label>
+              {{ feedback_form.strengths }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Areas to Improve</label>
+              {{ feedback_form.weaknesses }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px;">Detailed Comments</label>
+              {{ feedback_form.comments }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px;">Hiring Recommendation</label>
+              {{ feedback_form.recommendation }}
+            </div>
+          </div>
+          <div class="mt-4">
+            <button type="submit" class="btn-ims btn">
+              <i class="bi bi-send me-1"></i>Submit Feedback
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {% elif not interview.has_feedback %}
+    <div class="ims-card">
+      <div class="ims-card-body text-center" style="padding:60px 32px;">
+        <i class="bi bi-hourglass-split" style="font-size:48px;color:#94a3b8;display:block;margin-bottom:16px;"></i>
+        <h6 style="font-weight:700;color:#334155;">Feedback Pending</h6>
+        <p style="font-size:13px;color:#64748b;">
+          {% if interview.status == 'scheduled' %}
+          The interview is scheduled. Feedback can be submitted after the interview is marked as completed.
+          {% else %}
+          Awaiting feedback from the interviewer.
+          {% endif %}
+        </p>
+        {% if user.is_hr_admin or user.is_interviewer %}
+        <form method="post" action="{% url 'interviews:update' interview.pk %}" class="mt-3">
+          {% csrf_token %}
+          <input type="hidden" name="scheduled_at" value="{{ interview.scheduled_at|date:'Y-m-d' }}T{{ interview.scheduled_at|date:'H:i' }}">
+          <input type="hidden" name="duration" value="{{ interview.duration }}">
+          <input type="hidden" name="mode" value="{{ interview.mode }}">
+          <input type="hidden" name="status" value="completed">
+          <button type="submit" class="btn btn-sm btn-outline-success" style="border-radius:8px;font-weight:600;">
+            <i class="bi bi-check2-circle me-1"></i>Mark as Completed
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Update Modal (HR Only) -->
+{% if user.is_hr_admin %}
+<div class="modal fade" id="updateModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="border-radius:16px;border:none;">
+      <div class="modal-header" style="border-bottom:1px solid #f1f5f9;padding:20px 24px;">
+        <h5 class="modal-title fw-bold">Update Interview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="padding:24px;">
+        <form method="post" action="{% url 'interviews:update' interview.pk %}">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Date & Time</label>
+              {{ update_form.scheduled_at }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Status</label>
+              {{ update_form.status }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold" style="font-size:13px;">Duration (min)</label>
+              {{ update_form.duration }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold" style="font-size:13px;">Mode</label>
+              {{ update_form.mode }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px;">Meeting Link</label>
+              {{ update_form.meeting_link }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px;">Location</label>
+              {{ update_form.location }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px;">Notes</label>
+              {{ update_form.notes }}
+            </div>
+          </div>
+          <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn-ims btn">Save Changes</button>
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius:8px;">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Manage Staff — InterviewIQ{% endblock %}
+{% block page_title %}Staff Management{% endblock %}
+{% block page_subtitle %}Create and manage HR & Interviewer accounts{% endblock %}
+
+{% block topbar_actions %}
+<button class="btn-ims" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+  <i class="bi bi-plus-circle me-1"></i> Add Staff
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="ims-card">
+  <div class="ims-card-header">
+    <span class="ims-card-title">Staff Members ({{ staff_list.count }})</span>
+  </div>
+  <div style="overflow-x:auto;">
+    <table class="ims-table">
+      <thead>
+        <tr>
+          <th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Phone</th><th>Joined</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for staff in staff_list %}
+        <tr>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div style="width:34px;height:34px;border-radius:50%;background:#4f46e5;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;">
+                {{ staff.get_initials }}
+              </div>
+              <span class="fw-semibold">{{ staff.get_full_name }}</span>
+            </div>
+          </td>
+          <td>{{ staff.email }}</td>
+          <td>
+            <span class="badge {% if staff.is_hr_admin %}role-hr{% else %}role-interviewer{% endif %} px-2 py-1">
+              {{ staff.get_role_display }}
+            </span>
+          </td>
+          <td>{{ staff.get_department_display|default:"—" }}</td>
+          <td>{{ staff.phone_number|default:"—" }}</td>
+          <td>{{ staff.date_joined|date:"d M Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-4">No staff members yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add Staff Modal -->
+<div class="modal fade" id="addStaffModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 20px 60px rgba(0,0,0,.15);">
+      <div class="modal-header" style="border-bottom:1px solid #f1f5f9;padding:20px 24px;">
+        <h5 class="modal-title fw-bold">Add Staff Member</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="padding:24px;">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">First Name</label>
+              {{ form.first_name }}
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Last Name</label>
+              {{ form.last_name }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px;">Email</label>
+              {{ form.email }}
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Role</label>
+              {{ form.role }}
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Department</label>
+              {{ form.department }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold" style="font-size:13px;">Phone</label>
+              {{ form.phone_number }}
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Password</label>
+              {{ form.password1 }}
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold" style="font-size:13px;">Confirm Password</label>
+              {{ form.password2 }}
+            </div>
+          </div>
+          <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn-ims"><i class="bi bi-person-plus me-1"></i> Create Staff</button>
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

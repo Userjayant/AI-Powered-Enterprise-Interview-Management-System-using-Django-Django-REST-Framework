@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block title %}Candidates — InterviewIQ{% endblock %}
+{% block page_title %}Candidates{% endblock %}
+{% block page_subtitle %}{{ candidates.paginator.count }} total candidates in the pipeline{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'candidates:create' %}" class="btn-ims btn"><i class="bi bi-person-plus me-1"></i> Add Candidate</a>
+{% endblock %}
+
+{% block content %}
+<!-- Filters -->
+<div class="ims-card mb-3">
+  <div class="ims-card-body" style="padding:14px 20px;">
+    <form method="get" class="d-flex flex-wrap gap-2 align-items-center">
+      <div style="flex:1;min-width:200px;">
+        <div class="input-group input-group-sm">
+          <span class="input-group-text" style="border-radius:8px 0 0 8px;border-color:#e2e8f0;background:#f8fafc;"><i class="bi bi-search" style="color:#94a3b8;"></i></span>
+          <input type="text" name="q" value="{{ filters.q }}" class="form-control form-control-sm" placeholder="Search name, email, skills..." style="border-radius:0 8px 8px 0;border-color:#e2e8f0;">
+        </div>
+      </div>
+      <select name="status" class="form-select form-select-sm" style="width:auto;border-radius:8px;border-color:#e2e8f0;">
+        <option value="">All Status</option>
+        {% for val, label in status_choices %}
+        <option value="{{ val }}" {% if filters.status == val %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <select name="role" class="form-select form-select-sm" style="width:auto;border-radius:8px;border-color:#e2e8f0;">
+        <option value="">All Roles</option>
+        {% for role in job_roles %}
+        <option value="{{ role.pk }}" {% if filters.role == role.pk|stringformat:"s" %}selected{% endif %}>{{ role.title }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-sm btn-ims">Filter</button>
+      {% if filters.q or filters.status or filters.role %}
+      <a href="{% url 'candidates:list' %}" class="btn btn-sm btn-light" style="border-radius:8px;">Clear</a>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<!-- Candidate Table -->
+<div class="ims-card">
+  <div style="overflow-x:auto;">
+    <table class="ims-table">
+      <thead>
+        <tr>
+          <th>Candidate</th>
+          <th>Applied Role</th>
+          <th>Experience</th>
+          <th>AI Score</th>
+          <th>Status</th>
+          <th>Applied</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for candidate in candidates %}
+        <tr>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#0ea5e9);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;">
+                {{ candidate.full_name|slice:":1"|upper }}
+              </div>
+              <div>
+                <div class="fw-semibold" style="font-size:13px;color:#0f172a;">{{ candidate.full_name }}</div>
+                <div style="font-size:11px;color:#94a3b8;">{{ candidate.email }}</div>
+              </div>
+            </div>
+          </td>
+          <td style="font-size:13px;">{{ candidate.applied_role.title|default:"—" }}</td>
+          <td style="font-size:13px;">{{ candidate.experience }} yrs</td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="score-bar-wrap" style="width:70px;">
+                <div class="score-bar" style="width:{{ candidate.ai_resume_score }}%;background:{% if candidate.ai_resume_score >= 70 %}#10b981{% elif candidate.ai_resume_score >= 40 %}#f59e0b{% else %}#ef4444{% endif %};"></div>
+              </div>
+              <span style="font-size:12px;font-weight:700;">{{ candidate.ai_resume_score }}%</span>
+            </div>
+          </td>
+          <td>
+            <span class="badge {{ candidate.get_status_badge_class }}" style="font-size:11px;padding:5px 10px;border-radius:99px;">
+              {{ candidate.get_status_display }}
+            </span>
+          </td>
+          <td style="font-size:12px;color:#64748b;">{{ candidate.created_at|date:"d M Y" }}</td>
+          <td>
+            <div class="d-flex gap-1">
+              <a href="{% url 'candidates:detail' candidate.pk %}" class="btn btn-sm" style="background:#eef2ff;color:#4f46e5;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;" title="View">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{% url 'interviews:schedule' %}?candidate={{ candidate.pk }}" class="btn btn-sm" style="background:#ecfdf5;color:#059669;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;" title="Schedule Interview">
+                <i class="bi bi-calendar-plus"></i>
+              </a>
+              <a href="{% url 'candidates:update' candidate.pk %}" class="btn btn-sm" style="background:#fefce8;color:#ca8a04;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;" title="Edit">
+                <i class="bi bi-pencil"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7">
+            <div class="ims-empty">
+              <i class="bi bi-people"></i>
+              No candidates found. <a href="{% url 'candidates:create' %}" style="color:#4f46e5;font-weight:600;">Add one now →</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if candidates.has_other_pages %}
+  <div class="d-flex justify-content-between align-items-center px-4 py-3" style="border-top:1px solid #f1f5f9;">
+    <span style="font-size:13px;color:#64748b;">
+      Showing {{ candidates.start_index }}–{{ candidates.end_index }} of {{ candidates.paginator.count }}
+    </span>
+    <nav>
+      <ul class="pagination pagination-sm mb-0 gap-1">
+        {% if candidates.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ candidates.previous_page_number }}&q={{ filters.q }}&status={{ filters.status }}&role={{ filters.role }}" style="border-radius:6px;">‹</a>
+        </li>
+        {% endif %}
+        {% for num in candidates.paginator.page_range %}
+        <li class="page-item {% if num == candidates.number %}active{% endif %}">
+          <a class="page-link" href="?page={{ num }}&q={{ filters.q }}&status={{ filters.status }}&role={{ filters.role }}" style="border-radius:6px;">{{ num }}</a>
+        </li>
+        {% endfor %}
+        {% if candidates.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ candidates.next_page_number }}&q={{ filters.q }}&status={{ filters.status }}&role={{ filters.role }}" style="border-radius:6px;">›</a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
