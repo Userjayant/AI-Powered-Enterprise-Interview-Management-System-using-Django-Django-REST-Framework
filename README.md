@@ -1,106 +1,110 @@
-# AI-Powered Enterprise Interview Management System using Django & Django REST Framework
+<div align="center">
 
-A production-style AI-powered recruitment and interview management platform built using **Django**, **Django REST Framework**, and **Bootstrap 5**.  
-This system simulates a real-world corporate hiring workflow with role-based dashboards, candidate tracking, interview scheduling, feedback management, analytics, and REST APIs.
+# 🚀 AI-Powered Enterprise Interview Management System  
+### using Django & Django REST Framework
 
----
+<p align="center">
 
-# Project Overview
+<img src="https://img.shields.io/badge/Django-6.0-green?style=for-the-badge&logo=django" />
+<img src="https://img.shields.io/badge/Django_REST_Framework-DRF-red?style=for-the-badge&logo=django" />
+<img src="https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python" />
+<img src="https://img.shields.io/badge/Bootstrap-5-purple?style=for-the-badge&logo=bootstrap" />
+<img src="https://img.shields.io/badge/SQLite-Database-lightblue?style=for-the-badge&logo=sqlite" />
+<img src="https://img.shields.io/badge/Status-Under_Development-orange?style=for-the-badge" />
 
-The application is designed to streamline and automate the hiring process inside modern organizations.
-
-The platform allows:
-
-- HR/Admins to manage recruitment workflows
-- Interviewers to conduct evaluations
-- Candidates to track applications and interviews
-
-The system includes:
-- Role-based authentication
-- Resume management
-- Interview scheduling
-- Feedback & scoring
-- Analytics dashboard
-- REST APIs
-- AI-powered resume screening
+</p>
 
 ---
 
-# Features
+### 🏢 Enterprise-Level HR Recruitment & Interview Management Platform
 
-## Authentication & Authorization
+A modern enterprise-grade recruitment platform built using **Django** and **Django REST Framework** that simulates real-world company hiring workflows including candidate management, interview scheduling, technical evaluations, AI resume screening, analytics dashboards, and role-based authentication.
+
+---
+
+</div>
+
+# 📌 Features
+
+## 🔐 Authentication & Role Management
 - Custom User Model
 - Role-Based Access Control
-- Secure Login & Logout
-- Password Reset System
+- HR / Interviewer / Candidate Dashboards
+- Login / Logout System
 - Profile Management
+- Password Reset
 
-## Candidate Management
-- Add/Edit/Delete Candidates
-- Resume Upload (PDF/DOC)
+---
+
+## 👨‍💼 Candidate Management
+- Add / Edit / Delete Candidates
+- Resume Upload System
 - Skills & Experience Tracking
-- Application Status Tracking
-- Job Role Assignment
+- Candidate Status Tracking
+- Candidate Profiles
 
-## Interview Management
-- Schedule Interviews
+---
+
+## 📅 Interview Management
+- Interview Scheduling
 - Multiple Interview Rounds
 - Assign Interviewers
+- Technical / HR / Final Rounds
 - Interview Status Tracking
-- Calendar-Based Workflow
 
-## Feedback & Evaluation
-- Technical Evaluation
-- Communication Assessment
-- Problem Solving Score
-- Recommendation System
-- Final Hiring Decision
+---
 
-## Dashboard & Analytics
-- HR Dashboard
-- Interviewer Dashboard
-- Candidate Dashboard
-- Recruitment Analytics
-- Charts & Reports
-
-## AI Resume Screening
-- Resume Keyword Extraction
-- Skill Matching
+## 🧠 AI Resume Screening
+- Resume Keyword Matching
+- Skill Extraction
 - AI Resume Score Generation
-
-## REST APIs
-- Candidate APIs
-- Interview APIs
-- Feedback APIs
-- Authentication APIs
+- Candidate Ranking
 
 ---
 
-# Tech Stack
-
-## Backend
-- Django
-- Django REST Framework (DRF)
-
-## Frontend
-- Bootstrap 5
-- HTML5
-- CSS3
-- JavaScript
-
-## Database
-- SQLite (Development)
-- PostgreSQL Compatible Structure
-
-## Additional Libraries
-- django-filter
-- Pillow
-- python-dotenv
-- SimpleJWT
+## 📝 Feedback & Evaluation
+- Technical Evaluation
+- Communication Evaluation
+- Problem Solving Assessment
+- Interviewer Recommendations
+- Final Hiring Decisions
 
 ---
 
-# Current Project Structure
+## 📊 Analytics Dashboard
+- Total Candidates
+- Selected Candidates
+- Interview Statistics
+- Hiring Analytics
+- Dashboard Cards & Charts
+
+---
+
+## 🌐 REST API Development
+- DRF Serializers
+- API Endpoints
+- Token Authentication
+- Role-Based APIs
+- JSON Responses
+
+---
+
+# 🛠️ Tech Stack
+
+| Technology | Usage |
+|------------|-------|
+| Python 3.12 | Backend Development |
+| Django | Web Framework |
+| Django REST Framework | API Development |
+| Bootstrap 5 | Frontend UI |
+| SQLite | Development Database |
+| HTML5 / CSS3 / JS | Frontend Design |
+| Pillow | Image Uploads |
+| Django Filters | Search & Filtering |
+
+---
+
+# 📂 Project Structure
 
 ```bash
 NEW_INTERVIEW_SYSTEM/
@@ -162,7 +166,7 @@ NEW_INTERVIEW_SYSTEM/
 
 ---
 
-# Installation Guide
+# ⚙️ Installation
 
 ## Clone Repository
 
@@ -175,7 +179,7 @@ git clone https://github.com/Userjayant/AI-Powered-Enterprise-Interview-Manageme
 ## Navigate to Project
 
 ```bash
-cd NEW_INTERVIEW_SYSTEM
+cd AI-Powered-Enterprise-Interview-Management-System-using-Django-Django-REST-Framework
 ```
 
 ---
@@ -212,19 +216,11 @@ pip install -r requirements.txt
 
 ---
 
-## Apply Migrations
+## Run Migrations
 
 ```bash
 python manage.py makemigrations
 python manage.py migrate
-```
-
----
-
-## Create Superuser
-
-```bash
-python manage.py createsuperuser
 ```
 
 ---
@@ -237,54 +233,37 @@ python manage.py runserver
 
 ---
 
-# API Modules
+# 🚀 Future Enhancements
 
-The project includes REST APIs for:
-
-- Authentication
-- Candidates
-- Interviews
-- Feedback
-- Recruitment Workflow
-
----
-
-# Future Enhancements
-
-- AI-based Candidate Ranking
-- Resume Parsing using NLP
-- Real-Time Notifications
-- Video Interview Integration
-- Email Automation
-- Interview Analytics Dashboard
+- AI-Based Resume Parsing
+- Email Notification System
+- Real-Time Interview Tracking
+- Calendar Integration
+- Advanced Analytics Dashboard
 - PostgreSQL Deployment
-- Docker Support
-- CI/CD Integration
+- Docker Deployment
+- JWT Authentication
+- Live Interview Monitoring
 
 ---
 
-# Screenshots
+# 👨‍💻 Developer
 
-Screenshots will be added after UI completion.
+### Jayant Thevarakonda
 
----
-
-# Project Status
-
-Project is currently under active development.
+Final Year B.Tech AI Student  
+Web Developer | Django Developer | AI Enthusiast
 
 ---
 
-# Author
+# ⭐ Project Status
 
-## Jayant Thevarakonda
-
-B.Tech Artificial Intelligence  
-Full Stack Django Developer  
-AI & Web Development Enthusiast
+🚧 Currently Under Professional Development
 
 ---
 
-# License
+# 📜 License
 
-This project is developed for educational and internship assessment purposes.
+This project is developed for educational, portfolio, and internship assessment purposes.
+
+```
